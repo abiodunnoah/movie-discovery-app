@@ -1,21 +1,17 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <nav>
-    <!-- <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink> -->
-  </nav>
-
-  <RouterView />
+  <div class="container">
+    <RouterView />
+  </div>
 </template>
 
-<style scoped>
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+<style scope>
+.container {
+  /* max-width: 1px; */
+  margin: 0 auto;
+  width: 95%;
 }
 </style>
