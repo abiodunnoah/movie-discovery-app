@@ -13,9 +13,10 @@ const selectedGenre = ref(null);
 const search = ref('');
 const page = ref(1);
 const totalPages = ref(1);
-// const isLoading = ref(false);
+const isLoading = ref(false);
 
 const getMovies = async () => {
+  isLoading.value = true;
   try {
     const endPoint = search.value ? `${BASE_URL}/search/movie` : `${BASE_URL}/discover/movie`;
 
@@ -32,6 +33,8 @@ const getMovies = async () => {
     console.log(response.data);
   } catch (error) {
     console.log('Error fetching Movies', error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -66,6 +69,10 @@ onMounted(() => {
       :selectedGenre="selectedGenre"
     />
 
+    <div v-if="isLoading" class="flex justify-center h-96">
+      <NSpin size="large" />
+    </div>
+
     <div>
       <MovieCard :movies="movies" />
     </div>
@@ -77,7 +84,7 @@ onMounted(() => {
   </main>
 </template>
 
-<style>
+<style scoped>
 .button {
   border: none;
   width: 50px;

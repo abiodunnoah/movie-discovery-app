@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { RouterLink } from 'vue-router';
+// import { RouterLink } from 'vue-router';
 import axios from 'axios';
+import { NButton } from 'naive-ui';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -55,6 +56,16 @@ onMounted(() => {
             placeholder="Search..."
             class="border-0 bg-blue-50 text-gray-800 p-1.5 rounded-3xl pr-5"
           />
+        </div>
+        <div class="flex">
+          <div class="pr-3.5">
+            <router-link to="/favorites">
+              <p class="cursor-pointer">Favorite</p>
+            </router-link>
+          </div>
+          <div>
+            <p class="cursor-pointer">Watchlist</p>
+          </div>
         </div>
         <div class="w-24">
           <img

@@ -10,7 +10,7 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
       <RouterLink :to="`/movie/${movie.id}`">
         <img v-if="movie.poster_path" :src="`${IMAGE_BASE_URL}${movie.poster_path}`" alt="Poster" />
         <div class="moveies-title">
-          <h3>{{ movie.original_title }}</h3>
+          <h1>{{ movie.original_title }}</h1>
         </div>
       </RouterLink>
     </div>
@@ -21,28 +21,23 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 .movie-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  /* gap: 5px; */
   justify-content: center;
-  /* padding: 1rem; */
   margin-top: 30px;
 }
 
 .movies {
   width: 205px;
-  /* height: 250px; */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* line-height: 50px; */
   cursor: pointer;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .movies img {
   width: 100%;
-  height: 100%;
   object-fit: cover;
   border-radius: 5px;
 }
