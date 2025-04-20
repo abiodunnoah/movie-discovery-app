@@ -7,8 +7,10 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHeart as fasHeart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBookmark as fasBookmark } from '@fortawesome/free-solid-svg-icons';
+import { faBookmark as farBookmark } from '@fortawesome/free-regular-svg-icons';
 
-library.add(fasHeart, farHeart);
+library.add(fasHeart, farHeart, fasBookmark, farBookmark);
 
 import App from './App.vue';
 import router from './router';

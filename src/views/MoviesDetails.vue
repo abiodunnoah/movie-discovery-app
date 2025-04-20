@@ -2,9 +2,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import '@fortawesome/fontawesome-free/css/all.css';
 import { useFavoritesStore } from '@/stores/favourites';
-// import { icon } from '@fortawesome/fontawesome-svg-core';
+import { useWatchlistStore } from '@/stores/WatchList';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -16,6 +15,7 @@ const movie = ref(null);
 const credit = ref({ cast: [], crew: [] });
 const isLoading = ref(false);
 const favoritesStore = useFavoritesStore();
+const WatchlistStore = useWatchlistStore();
 
 const getMovieDetails = async () => {
   isLoading.value = true;
@@ -70,7 +70,14 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
           </button>
         </div>
         <div>
-          <button class="bg-black p-1.5 rounded-md border-1 cursor-pointer">Watchlist</button>
+          <button class="bg-black p-1.5 rounded-md border-1 cursor-pointer">
+            Watchlist
+            <font-awesome-icon
+              :icon="[WatchlistStore.isWatchlist(movie.id) ? 'fas' : 'far', 'bookmark']"
+              @click="WatchlistStore.toggleWatch(movie)"
+              class="cursor-pointer text-amber-400 text-2xl"
+            />
+          </button>
         </div>
       </div>
       <h2 class="text-xl">Overview :</h2>

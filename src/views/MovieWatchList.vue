@@ -1,25 +1,24 @@
 <script setup>
-import { useFavoritesStore } from '@/stores/favourites';
 import { useRouter } from 'vue-router';
+import { useWatchlistStore } from '@/stores/WatchList';
 
 const router = useRouter();
-const favoritesStore = useFavoritesStore();
-
+const watchStore = useWatchlistStore();
 const getPoster = (path) => `https://image.tmdb.org/t/p/w500${path}`;
 
-const deleteFavorite = (id) => {
-  favoritesStore.removeFavorite(id);
+const deleteWatchlist = (id) => {
+  watchStore.removeWatchlist(id);
 };
 </script>
 
 <template>
   <div class="pt-5 pb-12 text-white">
-    <h1 class="pb-5 text-2xl flex justify-center">My Favorite</h1>
-    <div v-if="favoritesStore.favorites.length === 0" class="no-text">
-      <p>No Favorite List Available</p>
+    <h1 class="pb-5 text-2xl flex justify-center">My Watchlist</h1>
+    <div v-if="watchStore.watchlist.length === 0" class="no-text">
+      <p>No Watchlist List Available</p>
     </div>
-    <div v-else class="favorite-container">
-      <div v-for="movie in favoritesStore.favorites" :key="movie.id" class="favorite-card">
+    <div v-else class="watch-container">
+      <div v-for="movie in watchStore.watchlist" :key="movie.id" class="watch-card">
         <div class="w-[200px]">
           <router-link :to="`/movie/${movie.id}`">
             <img :src="getPoster(movie.poster_path)" alt="Movie Poster" class="rounded-2xl" />
@@ -30,10 +29,10 @@ const deleteFavorite = (id) => {
         </div>
         <div class="pt-4 pb-4">
           <button
-            @click="deleteFavorite(movie.id)"
+            @click="deleteWatchlist(movie.id)"
             class="w-fit bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-4 py-2 rounded"
           >
-            Remove from Favorites
+            Remove from Watchlist
           </button>
         </div>
       </div>
@@ -45,27 +44,27 @@ const deleteFavorite = (id) => {
 </template>
 
 <style scoped>
-.favorite-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  justify-content: center;
-  margin-top: 30px;
-}
-
-.favorite-card {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  margin-bottom: 25px;
-}
-
 .no-text {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 300px;
   color: grey;
+}
+
+.watch-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.watch-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 25px;
 }
 </style>

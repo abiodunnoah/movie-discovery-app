@@ -64,7 +64,9 @@ onMounted(() => {
             </router-link>
           </div>
           <div>
-            <p class="cursor-pointer">Watchlist</p>
+            <router-link to="/watchlist">
+              <p class="cursor-pointer">Watchlist</p>
+            </router-link>
           </div>
         </div>
         <div class="w-24">
