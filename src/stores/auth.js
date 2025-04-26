@@ -20,6 +20,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async logout() {
       await signOut(auth);
+      this.user = null;
     },
     fetchUser() {
       onAuthStateChanged(auth, (user) => {
