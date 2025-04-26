@@ -3,6 +3,8 @@ import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import NavBar from '@/components/NavBar.vue';
 import MovieCard from '@/components/MovieCard.vue';
+import { useAuthStore } from '@/stores/auth';
+import { auth } from '@/Firebase';
 
 // const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -14,6 +16,8 @@ const search = ref('');
 const page = ref(1);
 const totalPages = ref(1);
 const isLoading = ref(false);
+const authStore = useAuthStore();
+authStore.fetchUser();
 
 const getMovies = async () => {
   isLoading.value = true;
