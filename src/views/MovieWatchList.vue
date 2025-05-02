@@ -1,31 +1,34 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { useWatchlistStore } from '@/stores/WatchList';
+import { useUserDataStore } from '@/stores/userData';
+// import { useWatchlistStore } from '@/stores/WatchList';
 
 const router = useRouter();
-const watchStore = useWatchlistStore();
+const user = useUserDataStore();
+// const watchStore = useWatchlistStore();
+
 const getPoster = (path) => `https://image.tmdb.org/t/p/w500${path}`;
 
 const deleteWatchlist = (id) => {
-  watchStore.removeWatchlist(id);
+  user.removeWatchlist(id);
 };
 </script>
 
 <template>
   <div class="pt-5 pb-12 text-white">
     <h1 class="pb-5 text-2xl flex justify-center">My Watchlist</h1>
-    <div v-if="watchStore.watchlist.length === 0" class="no-text">
+    <div v-if="user.watchlist.length === 0" class="no-text">
       <p>No Watchlist List Available</p>
     </div>
     <div v-else class="watch-container">
-      <div v-for="movie in watchStore.watchlist" :key="movie.id" class="watch-card">
+      <div v-for="movie in user.watchlist" :key="movie.id" class="watch-card">
         <div class="w-[200px]">
           <router-link :to="`/movie/${movie.id}`">
             <img :src="getPoster(movie.poster_path)" alt="Movie Poster" class="rounded-2xl" />
           </router-link>
         </div>
         <div class="pt-2">
-          <h1 class="text-xl">{{ movie.original_title }}</h1>
+          <h1 class="text-sm">{{ movie.original_title }}</h1>
         </div>
         <div class="pt-4 pb-4">
           <button

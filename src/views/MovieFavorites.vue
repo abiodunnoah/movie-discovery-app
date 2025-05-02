@@ -1,32 +1,34 @@
 <script setup>
-import { useFavoritesStore } from '@/stores/favourites';
 import { useRouter } from 'vue-router';
+import { useUserDataStore } from '@/stores/userData';
+// import { useFavoritesStore } from '@/stores/favourites';
 
 const router = useRouter();
-const favoritesStore = useFavoritesStore();
+const user = useUserDataStore();
+// const favoritesStore = useFavoritesStore();
 
 const getPoster = (path) => `https://image.tmdb.org/t/p/w500${path}`;
 
 const deleteFavorite = (id) => {
-  favoritesStore.removeFavorite(id);
+  user.removeFavorite(id);
 };
 </script>
 
 <template>
   <div class="pt-5 pb-12 text-white">
     <h1 class="pb-5 text-2xl flex justify-center">My Favorite</h1>
-    <div v-if="favoritesStore.favorites.length === 0" class="no-text">
+    <div v-if="user.favorites.length === 0" class="no-text">
       <p>No Favorite List Available</p>
     </div>
     <div v-else class="favorite-container">
-      <div v-for="movie in favoritesStore.favorites" :key="movie.id" class="favorite-card">
+      <div v-for="movie in user.favorites" :key="movie.id" class="favorite-card">
         <div class="w-[200px]">
           <router-link :to="`/movie/${movie.id}`">
             <img :src="getPoster(movie.poster_path)" alt="Movie Poster" class="rounded-2xl" />
           </router-link>
         </div>
         <div class="pt-2">
-          <h1 class="text-xl">{{ movie.original_title }}</h1>
+          <h1 class="text-sm">{{ movie.original_title }}</h1>
         </div>
         <div class="pt-4 pb-4">
           <button

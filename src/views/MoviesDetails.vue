@@ -2,8 +2,9 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import { useFavoritesStore } from '@/stores/favourites';
-import { useWatchlistStore } from '@/stores/WatchList';
+// import { useFavoritesStore } from '@/stores/favourites';
+// import { useWatchlistStore } from '@/stores/WatchList';
+import { useUserDataStore } from '@/stores/userData';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -14,8 +15,9 @@ const router = useRouter();
 const movie = ref(null);
 const credit = ref({ cast: [], crew: [] });
 const isLoading = ref(false);
-const favoritesStore = useFavoritesStore();
-const WatchlistStore = useWatchlistStore();
+// const favoritesStore = useFavoritesStore();
+// const WatchlistStore = useWatchlistStore();
+const userData = useUserDataStore();
 
 const getMovieDetails = async () => {
   isLoading.value = true;
@@ -60,11 +62,11 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
         <div class="pr-5">
           <button
             class="bg-black p-1.5 rounded-md border-1 cursor-pointer"
-            @click="favoritesStore.toggleFavorite(movie)"
+            @click="userData.toggleFavorite(movie)"
           >
             Favorite
             <font-awesome-icon
-              :icon="[favoritesStore.isFavorite(movie.id) ? 'fas' : 'far', 'heart']"
+              :icon="[userData.isFavorite(movie.id) ? 'fas' : 'far', 'heart']"
               class="icon"
             />
           </button>
@@ -73,8 +75,8 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
           <button class="bg-black p-1.5 rounded-md border-1 cursor-pointer">
             Watchlist
             <font-awesome-icon
-              :icon="[WatchlistStore.isWatchlist(movie.id) ? 'fas' : 'far', 'bookmark']"
-              @click="WatchlistStore.toggleWatch(movie)"
+              @click="userData.toggleWatchlist(movie)"
+              :icon="[userData.isWatchlist(movie.id) ? 'fas' : 'far', 'bookmark']"
               class="cursor-pointer text-amber-400 text-2xl"
             />
           </button>

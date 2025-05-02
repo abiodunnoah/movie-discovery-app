@@ -15,6 +15,7 @@ library.add(fasHeart, farHeart, fasBookmark, farBookmark);
 import App from './App.vue';
 import router from './router';
 import naive from 'naive-ui';
+import { useUserDataStore } from './stores/userData';
 
 import '@fortawesome/fontawesome-free/css/all.css';
 
@@ -26,3 +27,5 @@ app.use(naive);
 app.component('font-awesome-icon', FontAwesomeIcon);
 
 app.mount('#app');
+
+useUserDataStore().init();

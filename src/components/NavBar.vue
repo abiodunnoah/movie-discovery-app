@@ -1,8 +1,12 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-// import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 import { NButton } from 'naive-ui';
+
+const router = useRouter();
+const auth = useAuthStore();
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -11,6 +15,17 @@ const genres = ref([]);
 const emit = defineEmits(['genreSelected']);
 const { search, selectedGenre } = defineProps(['search', 'selectedGenre']);
 const searchInput = ref(search);
+
+auth.fetchUser();
+
+const handleLogout = async () => {
+  try {
+    await auth.logout();
+    // router.push('/login');
+  } catch (e) {
+    console.error('Logout failed:', e);
+  }
+};
 
 const getGenres = async () => {
   try {
@@ -69,12 +84,24 @@ onMounted(() => {
             </router-link>
           </div>
         </div>
-        <div class="w-24">
-          <img
-            src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-762.jpg?w=826"
-            alt="profile-image"
-            class="w-10 rounded-3xl cursor-pointer"
-          />
+        <div v-if="auth.user" class="flex flex-col justify-center">
+          <div class="w-24 pb-2 pl-4">
+            <img
+              src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-762.jpg?w=826"
+              alt="profile-image"
+              class="w-10 rounded-3xl cursor-pointer"
+            />
+          </div>
+          <div>
+            <button @click="handleLogout" class="px-3 py-1 bg-red-600 hover:bg-red-800 rounded">
+              Logout
+            </button>
+          </div>
+        </div>
+        <div v-else>
+          <router-link to="/login" class="px-3 py-1 bg-blue-600 hover:bg-blue-800 rounded"
+            >Login</router-link
+          >
         </div>
       </div>
     </header>

@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth';
 
 export const useAuthStore = defineStore('auth', {
-  sate: () => ({
+  state: () => ({
     user: null,
   }),
   actions: {
