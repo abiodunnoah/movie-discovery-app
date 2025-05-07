@@ -4,9 +4,21 @@ import { RouterLink, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 import { NButton } from 'naive-ui';
+import { useThemeStore } from '@/stores/Theme';
+// import { useDark, useToggle } from '@vueuse/core';
 
 const router = useRouter();
 const auth = useAuthStore();
+const themeStore = useThemeStore();
+
+// const isDark = useDark({
+//   selector: 'body',
+//   attribute: 'color-scheme',
+//   valueDark: 'dark',
+//   valueLight: 'light',
+// });
+
+// const toggleDark = useToggle(isDark);
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -58,7 +70,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav class="text-white p-4">
+  <nav class="p-4">
     <header>
       <div class="pt-5 flex justify-between pb-2 border-b-1 border-b-gray-500">
         <div class="w-5">
@@ -83,6 +95,16 @@ onMounted(() => {
               <p class="cursor-pointer">Watchlist</p>
             </router-link>
           </div>
+        </div>
+        <div>
+          <label class="switch">
+            <input
+              type="checkbox"
+              :checked="themeStore.theme === 'dark'"
+              @change="themeStore.toggleTheme"
+            />
+            <span class="slider round"></span>
+          </label>
         </div>
         <div v-if="auth.user" class="flex flex-col justify-center">
           <div class="w-24 pb-2 pl-4">
@@ -172,4 +194,76 @@ onMounted(() => {
 .container-genres::-webkit-scrollbar {
   display: none;
 }
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/*
+[color-scheme='dark'] {
+  background-color: rgb(57, 57, 57);
+}
+
+[color-scheme='light'] {
+  background-color: rgb(255, 255, 255);
+} */
 </style>

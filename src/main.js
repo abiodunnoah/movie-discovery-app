@@ -1,4 +1,5 @@
 import './assets/main.css';
+import './index.css';
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
@@ -25,6 +26,10 @@ app.use(createPinia());
 app.use(router);
 app.use(naive);
 app.component('font-awesome-icon', FontAwesomeIcon);
+
+import { useThemeStore } from './stores/Theme';
+const themeStore = useThemeStore();
+themeStore.applyTheme();
 
 app.mount('#app');
 

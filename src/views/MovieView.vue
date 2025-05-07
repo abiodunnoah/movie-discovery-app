@@ -93,7 +93,7 @@ onMounted(() => {
   border-radius: 100%;
   margin: 0 5px;
   cursor: point;
-  background: white;
+  background: rgba(221, 220, 220, 0.5);
   color: black;
 }
 </style>

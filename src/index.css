@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ─── LIGHT MODE (default) ─────────────────── */
+  body {
+    background-color: #ffffff;
+    color: #111111;
+  }
+
+  /* ─── DARK MODE OVERRIDES ─────────────────── */
+  html.dark body {
+    background-color: #1e1e1e;
+    color: #eeeeee;
+  }
+}
