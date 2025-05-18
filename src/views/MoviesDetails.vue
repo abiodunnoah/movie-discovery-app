@@ -64,7 +64,7 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
             class="bg-black p-1.5 rounded-md border-1 cursor-pointer"
             @click="userData.toggleFavorite(movie)"
           >
-            Favorite
+            <!-- Favorite -->
             <font-awesome-icon
               :icon="[userData.isFavorite(movie.id) ? 'fas' : 'far', 'heart']"
               class="icon"
@@ -73,7 +73,7 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
         </div>
         <div>
           <button class="bg-black p-1.5 rounded-md border-1 cursor-pointer">
-            Watchlist
+            <!-- Watchlist -->
             <font-awesome-icon
               @click="userData.toggleWatchlist(movie)"
               :icon="[userData.isWatchlist(movie.id) ? 'fas' : 'far', 'bookmark']"
@@ -93,7 +93,7 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
       <div
         style="background-color: #121212; padding: 20px; border-radius: 10px; margin-bottom: 30px"
       >
-        <p class="font-bold text-xl">Rating:</p>
+        <!-- <p class="font-bold text-xl">Rating:</p> -->
         <div class="text-xl pr">
           <i
             v-for="n in fullStars"
@@ -177,7 +177,7 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
 
 .icon {
   color: red;
-  font-size: 20px;
+  font-size: 25px;
   cursor: pointer;
 }
 </style>

@@ -14,4 +14,21 @@
     background-color: #1e1e1e;
     color: #eeeeee;
   }
+
+  @layer base {
+    /* Make all these tags inherit from the body’s color variable */
+    p,
+    span,
+    li,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    a,
+    div {
+      color: var(--color-text);
+    }
+  }
 }

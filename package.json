@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@tailwindcss/postcss": "^4.1.5",
+    "@tailwindcss/postcss": "^4.1.7",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/eslint-config-prettier": "^10.2.0",
     "autoprefixer": "^10.4.21",
@@ -39,8 +39,21 @@
     "naive-ui": "^2.41.0",
     "postcss": "^8.5.3",
     "prettier": "3.5.3",
-    "tailwindcss": "^4.1.5",
+    "tailwindcss": "^4.1.7",
     "vite": "^6.2.1",
     "vite-plugin-vue-devtools": "^7.7.2"
-  }
+  },
+  "description": "This template should help get you started developing with Vue 3 in Vite.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abiodunnoah/movie-discovery-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abiodunnoah/movie-discovery-app/issues"
+  },
+  "homepage": "https://github.com/abiodunnoah/movie-discovery-app#readme"
 }

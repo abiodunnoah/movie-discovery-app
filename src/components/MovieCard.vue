@@ -10,7 +10,7 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
       <RouterLink :to="`/movie/${movie.id}`">
         <img v-if="movie.poster_path" :src="`${IMAGE_BASE_URL}${movie.poster_path}`" alt="Poster" />
         <div class="moveies-title">
-          <h1>{{ movie.original_title }}</h1>
+          <h1 class="">{{ movie.original_title }}</h1>
         </div>
       </RouterLink>
     </div>
@@ -44,6 +44,6 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 .moveies-title {
   text-align: center;
-  color: white;
+  /* color: white; */
 }
 </style>

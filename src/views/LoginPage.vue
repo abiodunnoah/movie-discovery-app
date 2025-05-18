@@ -23,29 +23,42 @@ async function submit() {
 
 <template>
   <div class="flex justify-center pt-10">
-    <div class="max-w-md mx-auto p-15 bg-white rounded-lg shadow text-black">
+    <div
+      class="max-w-md mx-auto p-10 rounded-lg shadow-md"
+      :class="[
+        'bg-[var(--color-background)]',
+        'text-[var(--color-text)]',
+        'border',
+        'border-[var(--color-border)]',
+      ]"
+    >
       <div class="pb-4">
-        <h2 class="text-2xl font-bold">Login</h2>
+        <h2 class="text-2xl font-bold text-[var(--color-heading)]">Login</h2>
       </div>
       <form @submit.prevent="submit">
         <div class="pb-4">
           <label class="block pb-1">Email:</label>
-          <input v-model="email" type="email" class="w-full border rounded px-3 py-2" required />
+          <input
+            v-model="email"
+            type="email"
+            class="w-full border border-[var(--color-border)] rounded px-3 py-2 bg-transparent text-[var(--color-text)]"
+            required
+          />
         </div>
         <div class="pb-4">
           <label class="block pb-1">Password:</label>
           <input
             v-model="password"
             type="password"
-            class="w-full border rounded px-3 py-2"
+            class="w-full border border-[var(--color-border)] rounded px-3 py-2 bg-transparent text-[var(--color-text)]"
             required
           />
         </div>
         <div v-if="error" class="pb-4 text-red-500">{{ error }}</div>
-        <div class="">
+        <div>
           <button
             type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
           >
             Sign In
           </button>

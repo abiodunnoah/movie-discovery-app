@@ -8,6 +8,7 @@ export const useThemeStore = defineStore('theme', {
     }
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return { theme: prefersDark ? 'dark' : 'light' };
+    // return { theme: 'light' };
   },
   actions: {
     toggleTheme() {
