@@ -22,9 +22,9 @@ async function submit() {
 </script>
 
 <template>
-  <div class="flex justify-center pt-10">
+  <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
     <div
-      class="mx-auto p-10 rounded-lg shadow-md max-w-md w-full border"
+      class="w-full max-w-md p-6 sm:p-8 md:p-10 rounded-lg shadow-md border"
       :class="[
         'bg-[var(--color-background)]',
         'text-[var(--color-text)]',
@@ -32,7 +32,7 @@ async function submit() {
       ]"
     >
       <div class="pb-4">
-        <h2 class="text-2xl font-bold text-[var(--color-heading)]">Register</h2>
+        <h2 class="text-2xl font-bold text-center text-[var(--color-heading)]">Register</h2>
       </div>
       <form @submit.prevent="submit">
         <div class="pb-4">
@@ -53,7 +53,7 @@ async function submit() {
             class="w-full border border-[var(--color-border)] rounded px-3 py-2 bg-transparent text-[var(--color-text)]"
           />
         </div>
-        <div v-if="error" class="pb-4 text-red-500">{{ error }}</div>
+        <div v-if="error" class="pb-4 text-red-500 text-sm">{{ error }}</div>
         <button
           type="submit"
           class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors"

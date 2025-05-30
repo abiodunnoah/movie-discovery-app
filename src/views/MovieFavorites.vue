@@ -1,11 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { useUserDataStore } from '@/stores/userData';
-// import { useFavoritesStore } from '@/stores/favourites';
 
 const router = useRouter();
 const user = useUserDataStore();
-// const favoritesStore = useFavoritesStore();
 
 const getPoster = (path) => `https://image.tmdb.org/t/p/w500${path}`;
 
@@ -15,59 +13,49 @@ const deleteFavorite = (id) => {
 </script>
 
 <template>
-  <div class="pt-5 pb-12 text-white">
-    <h1 class="pb-5 text-2xl flex justify-center">My Favorite</h1>
-    <div v-if="user.favorites.length === 0" class="no-text">
-      <p>No Favorite List Available</p>
+  <div class="pt-5 pb-12 text-white px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl font-semibold text-center mb-6">My Favorites</h1>
+
+    <!-- Empty state -->
+    <div v-if="!user.favorites.length" class="flex items-center justify-center h-64 text-gray-400">
+      <p>No favorites yet.</p>
     </div>
-    <div v-else class="favorite-container">
-      <div v-for="movie in user.favorites" :key="movie.id" class="favorite-card">
-        <div class="w-[200px]">
-          <router-link :to="`/movie/${movie.id}`">
-            <img :src="getPoster(movie.poster_path)" alt="Movie Poster" class="rounded-2xl" />
-          </router-link>
-        </div>
-        <div class="pt-2">
-          <h1 class="text-sm">{{ movie.original_title }}</h1>
-        </div>
-        <div class="pt-4 pb-4">
-          <button
-            @click="deleteFavorite(movie.id)"
-            class="w-fit bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-4 py-2 rounded"
-          >
-            Remove from Favorites
-          </button>
-        </div>
+
+    <!-- Responsive grid -->
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div v-for="movie in user.favorites" :key="movie.id" class="flex flex-col items-center">
+        <router-link :to="`/movie/${movie.id}`" class="w-full">
+          <img
+            :src="getPoster(movie.poster_path)"
+            alt="Movie Poster"
+            class="rounded-2xl shadow-lg transition-transform hover:scale-105"
+          />
+        </router-link>
+        <h2 class="mt-3 text-center text-base font-medium line-clamp-2">
+          {{ movie.original_title }}
+        </h2>
+        <button
+          @click="deleteFavorite(movie.id)"
+          class="mt-4 px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 rounded-full transition-colors"
+        >
+          Remove
+        </button>
       </div>
     </div>
-    <div class="flex justify-center pt-10">
-      <NButton secondary type="info" @click="router.back()">Back</NButton>
+
+    <!-- Back button -->
+    <div class="flex justify-center mt-12">
+      <NButton secondary type="info" @click="router.back()"> Back </NButton>
     </div>
   </div>
 </template>
 
 <style scoped>
-.favorite-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  justify-content: center;
-  margin-top: 30px;
-}
-
-.favorite-card {
+/* Optional: clamp titles to two lines with ellipsis */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  margin-bottom: 25px;
-}
-
-.no-text {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  color: grey;
 }
 </style>

@@ -22,9 +22,9 @@ async function submit() {
 </script>
 
 <template>
-  <div class="flex justify-center pt-10">
+  <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
     <div
-      class="max-w-md mx-auto p-10 rounded-lg shadow-md"
+      class="w-full max-w-md p-6 sm:p-8 md:p-10 rounded-lg shadow-md"
       :class="[
         'bg-[var(--color-background)]',
         'text-[var(--color-text)]',
@@ -33,7 +33,7 @@ async function submit() {
       ]"
     >
       <div class="pb-4">
-        <h2 class="text-2xl font-bold text-[var(--color-heading)]">Login</h2>
+        <h2 class="text-2xl font-bold text-center text-[var(--color-heading)]">Login</h2>
       </div>
       <form @submit.prevent="submit">
         <div class="pb-4">
@@ -54,7 +54,7 @@ async function submit() {
             required
           />
         </div>
-        <div v-if="error" class="pb-4 text-red-500">{{ error }}</div>
+        <div v-if="error" class="pb-4 text-red-500 text-sm">{{ error }}</div>
         <div>
           <button
             type="submit"

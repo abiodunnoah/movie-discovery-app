@@ -1,102 +1,93 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 import { NButton } from 'naive-ui';
 import { useThemeStore } from '@/stores/Theme';
-// import { useDark, useToggle } from '@vueuse/core';
 
 const router = useRouter();
 const auth = useAuthStore();
 const themeStore = useThemeStore();
 
-// const isDark = useDark({
-//   selector: 'body',
-//   attribute: 'color-scheme',
-//   valueDark: 'dark',
-//   valueLight: 'light',
-// });
-
-// const toggleDark = useToggle(isDark);
-
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const BASE_URL = 'https://api.themoviedb.org/3';
-
-const genres = ref([]);
-const emit = defineEmits(['genreSelected']);
+// Props & emits
+const emit = defineEmits(['genreSelected', 'update:search']);
 const { search, selectedGenre } = defineProps(['search', 'selectedGenre']);
+
+// Local state
 const searchInput = ref(search);
+const genres = ref([]);
+const mobileMenuOpen = ref(false);
 
+// Breakpoint detector
+const isDesktop = ref(window.innerWidth >= 768);
+function handleResize() {
+  isDesktop.value = window.innerWidth >= 768;
+}
+onMounted(() => window.addEventListener('resize', handleResize));
+onUnmounted(() => window.removeEventListener('resize', handleResize));
+
+// Auth & logout
 auth.fetchUser();
-
 const handleLogout = async () => {
   try {
     await auth.logout();
-    // router.push('/login');
+    mobileMenuOpen.value = false;
   } catch (e) {
-    console.error('Logout failed:', e);
+    console.error(e);
   }
 };
 
+// TMDB genres fetch
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const BASE_URL = 'https://api.themoviedb.org/3';
 const getGenres = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/genre/movie/list`, {
+    const { data } = await axios.get(`${BASE_URL}/genre/movie/list`, {
       params: { api_key: API_KEY },
     });
-    genres.value = response.data.genres;
-    console.log(response.data);
-  } catch (error) {
-    console.log('Error fetching genre', error);
+    genres.value = data.genres;
+  } catch (e) {
+    console.error('Error fetching genres', e);
   }
 };
+onMounted(getGenres);
 
-watch(searchInput, (newVal) => {
-  emit('update:search', newVal);
-});
+// Emit search updates
+watch(searchInput, (val) => emit('update:search', val));
 
+// Clear search on genre change
 watch(
   () => selectedGenre,
-  (newVal) => {
-    if (newVal) {
-      searchInput.value = '';
-    }
+  (g) => {
+    if (g) searchInput.value = '';
   },
 );
-
-onMounted(() => {
-  getGenres();
-});
 </script>
 
 <template>
-  <nav class="p-4">
-    <header>
-      <div class="pt-5 flex justify-between pb-2 border-b-1 border-b-gray-500">
-        <div class="w-5">
-          <h1 class="text-xl font-bold">Movie App</h1>
-        </div>
-        <div>
-          <input
-            v-model="searchInput"
-            type="search"
-            placeholder="Search..."
-            class="border-0 bg-blue-50 text-gray-800 p-1.5 rounded-3xl pr-5"
-          />
-        </div>
-        <div class="flex">
-          <div class="pr-3.5">
-            <router-link to="/favorites">
-              <p class="cursor-pointer">Favorite</p>
-            </router-link>
-          </div>
-          <div>
-            <router-link to="/watchlist">
-              <p class="cursor-pointer">Watchlist</p>
-            </router-link>
-          </div>
-        </div>
-        <div>
+  <nav
+    class="bg-[var(--color-background)] text-[var(--color-text)] border-b border-[var(--color-border)]"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- HEADER -->
+      <header class="flex items-center justify-between py-4">
+        <!-- Logo -->
+        <h1 class="text-xl font-bold">Movie App</h1>
+
+        <!-- Search -->
+        <input
+          v-model="searchInput"
+          type="search"
+          placeholder="Search..."
+          class="w-40 sm:w-48 md:w-56 lg:w-64 px-4 py-2 rounded-full border-0 bg-[var(--color-background-soft)] text-[var(--color-text)] placeholder-[var(--color-text)] caret-[var(--color-text)] focus:outline-none"
+        />
+
+        <!-- DESKTOP NAV -->
+        <div v-if="isDesktop" class="flex items-center gap-5">
+          <RouterLink to="/favorites">Favorite</RouterLink>
+          <RouterLink to="/watchlist">Watchlist</RouterLink>
+
           <label class="switch">
             <input
               type="checkbox"
@@ -105,112 +96,116 @@ onMounted(() => {
             />
             <span class="slider round"></span>
           </label>
-        </div>
-        <div v-if="auth.user" class="flex flex-col justify-center">
-          <div class="w-24 pb-2 pl-4">
-            <img
-              src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-762.jpg?w=826"
-              alt="profile-image"
-              class="w-10 rounded-3xl cursor-pointer"
-            />
-          </div>
+
           <div>
-            <button @click="handleLogout" class="px-3 py-1 bg-red-600 hover:bg-red-800 rounded">
-              Logout
-            </button>
+            <template v-if="auth.user">
+              <div class="flex items-center gap-2">
+                <img
+                  src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-762.jpg?w=826"
+                  class="w-8 h-8 rounded-full"
+                />
+                <button
+                  @click="handleLogout"
+                  class="px-3 py-1 bg-red-600 rounded text-white hover:bg-red-700 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            </template>
+            <template v-else>
+              <RouterLink
+                to="/login"
+                class="px-3 py-1 bg-blue-600 rounded text-white hover:bg-blue-700 transition-colors"
+              >
+                Login
+              </RouterLink>
+            </template>
           </div>
         </div>
-        <div v-else>
-          <router-link to="/login" class="px-3 py-1 bg-blue-600 hover:bg-blue-800 rounded"
-            >Login</router-link
-          >
+
+        <!-- MOBILE MENU BUTTON -->
+        <button v-else @click="mobileMenuOpen = !mobileMenuOpen" class="text-2xl ml-4">☰</button>
+      </header>
+
+      <!-- MOBILE DROPDOWN -->
+      <div v-if="!isDesktop && mobileMenuOpen" class="mt-4 mb-4 flex flex-col gap-4">
+        <RouterLink to="/favorites">Favorite</RouterLink>
+        <RouterLink to="/watchlist">Watchlist</RouterLink>
+
+        <label class="switch">
+          <input
+            type="checkbox"
+            :checked="themeStore.theme === 'dark'"
+            @change="themeStore.toggleTheme"
+          />
+          <span class="slider round"></span>
+        </label>
+
+        <div>
+          <template v-if="auth.user">
+            <div class="flex items-center gap-2">
+              <img
+                src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-762.jpg?w=826"
+                class="w-8 h-8 rounded-full"
+              />
+              <button
+                @click="handleLogout"
+                class="px-3 py-1 bg-red-600 rounded text-white hover:bg-red-700 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </template>
+          <template v-else>
+            <RouterLink
+              to="/login"
+              class="px-3 py-1 bg-blue-600 rounded text-white hover:bg-blue-700 transition-colors"
+            >
+              Login
+            </RouterLink>
+          </template>
         </div>
       </div>
-    </header>
-    <div class="container-genres">
-      <ul class="flex">
-        <n-button
-          quaternary
-          class="buttons"
-          @click="emit('genreSelected', '')"
-          :class="{ active: selectedGenre === '' || selectedGenre === null || searchInput !== '' }"
-        >
-          Home
-        </n-button>
-        <li v-for="genre in genres" :key="genre.id">
-          <n-button
-            quaternary
-            @click="emit('genreSelected', genre.id)"
-            class="buttons"
-            :class="{ active: selectedGenre === genre.id }"
-          >
-            {{ genre.name }}
-          </n-button>
-        </li>
-      </ul>
+
+      <!-- GENRE BAR -->
+      <div class="mt-4 overflow-x-auto no-scrollbar">
+        <ul class="flex items-center gap-2 whitespace-nowrap justify-start">
+          <li>
+            <NButton
+              quaternary
+              @click="emit('genreSelected', '')"
+              :class="{ active: selectedGenre === '' }"
+            >
+              Home
+            </NButton>
+          </li>
+          <li v-for="g in genres" :key="g.id">
+            <NButton
+              quaternary
+              @click="emit('genreSelected', g.id)"
+              :class="{ active: selectedGenre === g.id }"
+            >
+              {{ g.name }}
+            </NButton>
+          </li>
+        </ul>
+      </div>
     </div>
   </nav>
 </template>
 
 <style scoped>
-::placeholder {
-  padding-left: 15px;
-}
-
-.header {
-  color: white;
-  font-size: 20px;
-}
-
-.buttons {
-  color: white;
-  cursor: pointer;
-  margin-left: 8px;
-  flex-shrink: 0;
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: background 0.3s;
-}
-
-.buttons.active {
-  background-color: #214368;
-  color: #4b9ffa;
-}
-
-/* .buttons.active {
-  background-color: #007bff;
-  color: white;
-} */
-
-.container-genres {
-  width: 100%;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  margin-top: 10px;
-}
-
-.container-genres::-webkit-scrollbar {
-  display: none;
-}
-
-/* The switch - the box around the slider */
 .switch {
   position: relative;
   display: inline-block;
   width: 50px;
   height: 24px;
 }
-
-/* Hide default HTML checkbox */
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
-
-/* The slider */
 .slider {
   position: absolute;
   cursor: pointer;
@@ -219,10 +214,8 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: 0.4s;
   transition: 0.4s;
 }
-
 .slider:before {
   position: absolute;
   content: '';
@@ -231,39 +224,27 @@ onMounted(() => {
   left: 4px;
   bottom: 4px;
   background-color: white;
-  -webkit-transition: 0.4s;
   transition: 0.4s;
 }
-
 input:checked + .slider {
   background-color: #2196f3;
 }
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196f3;
-}
-
 input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
   transform: translateX(26px);
 }
-
-/* Rounded sliders */
 .slider.round {
   border-radius: 24px;
 }
-
 .slider.round:before {
   border-radius: 50%;
 }
 
-/*
-[color-scheme='dark'] {
-  background-color: rgb(57, 57, 57);
+/* Hide scrollbar in genre bar */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
-[color-scheme='light'] {
-  background-color: rgb(255, 255, 255);
-} */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 </style>

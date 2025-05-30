@@ -51,16 +51,47 @@
 } */
 
 html.dark {
+  /* main page background */
   --color-background: var(--vt-c-black);
+
+  /* “soft” surfaces: inputs, cards, etc. */
+  --color-background-soft: var(--vt-c-black-soft);
+
+  /* muted containers */
+  --color-background-mute: var(--vt-c-black-mute);
+
+  /* text color */
   --color-text: var(--vt-c-text-dark-1);
+
+  /* borders */
+  --color-border: var(--vt-c-divider-dark-2);
+  --color-border-hover: var(--vt-c-divider-dark-1);
 }
 
+/* === LIGHTWEIGHT RESET === */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
+}
+
+html,
+body,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ul,
+ol,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0; /* only reset margins on these elements */
+  padding: 0; /* optional */
 }
 
 body {

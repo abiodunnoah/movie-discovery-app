@@ -32,3 +32,29 @@
     }
   }
 }
+
+/* Style the active genre button — both our .buttons.active,
+   and Naive‑UI’s .n-button--active */
+.buttons.active,
+.n-button--active {
+  background-color: #214368;
+  color: #4b9ffa;
+}
+
+/* hide scrollbars but keep scrolling */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+input.search-input {
+  color: var(--color-text) !important;
+}
+
+input.search-input::placeholder {
+  color: var(--color-text) !important;
+  opacity: 0.6;
+}
