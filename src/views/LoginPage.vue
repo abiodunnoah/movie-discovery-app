@@ -33,7 +33,7 @@ async function submit() {
       ]"
     >
       <div class="pb-4">
-        <h2 class="text-2xl font-bold text-center text-[var(--color-heading)]">Login</h2>
+        <h2 class="text-2xl font-bold text-center text-[var(--color-text)]">Login</h2>
       </div>
       <form @submit.prevent="submit">
         <div class="pb-4">

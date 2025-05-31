@@ -22,49 +22,167 @@ async function submit() {
 </script>
 
 <template>
-  <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
-    <div
-      class="w-full max-w-md p-6 sm:p-8 md:p-10 rounded-lg shadow-md border"
-      :class="[
-        'bg-[var(--color-background)]',
-        'text-[var(--color-text)]',
-        'border-[var(--color-border)]',
-      ]"
-    >
-      <div class="pb-4">
-        <h2 class="text-2xl font-bold text-center text-[var(--color-heading)]">Register</h2>
-      </div>
-      <form @submit.prevent="submit">
-        <div class="pb-4">
-          <label class="block pb-1">Email:</label>
-          <input
-            v-model="email"
-            type="email"
-            required
-            class="w-full border border-[var(--color-border)] rounded px-3 py-2 bg-transparent text-[var(--color-text)]"
-          />
+  <div class="register-root">
+    <div class="form-container">
+      <h2 class="form-title">Register</h2>
+      <form @submit.prevent="submit" class="form-content">
+        <div class="form-group">
+          <label for="email" class="form-label">Email:</label>
+          <input id="email" v-model="email" type="email" required class="form-input" />
         </div>
-        <div class="pb-4">
-          <label class="block pb-1">Password:</label>
-          <input
-            v-model="password"
-            type="password"
-            required
-            class="w-full border border-[var(--color-border)] rounded px-3 py-2 bg-transparent text-[var(--color-text)]"
-          />
+        <div class="form-group">
+          <label for="password" class="form-label">Password:</label>
+          <input id="password" v-model="password" type="password" required class="form-input" />
         </div>
-        <div v-if="error" class="pb-4 text-red-500 text-sm">{{ error }}</div>
-        <button
-          type="submit"
-          class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors"
-        >
-          Sign Up
-        </button>
+        <div v-if="error" class="form-error">{{ error }}</div>
+        <!-- Sign Up button with fallback -->
+        <button type="submit" class="submit-button">Sign Up</button>
       </form>
-      <p class="pt-4 text-sm text-center">
+      <p class="switch-login">
         Already have an account?
-        <router-link to="/login" class="text-green-600 hover:underline"> Login here </router-link>
+        <!-- “Login here” link with fallback -->
+        <router-link to="/login" class="login-link">Login here</router-link>
       </p>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Root wrapper */
+.register-root {
+  background-color: var(--color-background, #ffffff);
+  color: var(--color-text, #181818);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Form container */
+.form-container {
+  background-color: var(--color-background-soft, #f5f5f5);
+  border: 1px solid var(--color-border, #cccccc);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form title */
+.form-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--color-text, #181818);
+}
+
+/* Form layout */
+.form-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label + Input */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: var(--color-text, #181818);
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--color-text, #181818);
+  background-color: transparent;
+  border: 1px solid var(--color-border, #cccccc);
+  border-radius: 4px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent, #38a169);
+}
+
+.form-error {
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #e53e3e;
+}
+
+/* Sign Up button with fallback color if --color-accent is missing */
+.submit-button {
+  background-color: var(--color-accent, #38a169);
+  color: #ffffff;
+  padding: 10px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+  background-color: var(--color-accent-hover, #2f855a);
+}
+
+/* “Already have an account?” text */
+.switch-login {
+  margin-top: 16px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--color-text, #181818);
+}
+
+/* Login link with fallback if --color-link is missing */
+.login-link {
+  color: var(--color-link, #3182ce);
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.login-link:hover {
+  color: var(--color-link-hover, #2b6cb0);
+  text-decoration: underline;
+}
+
+/* Responsive tweaks */
+@media (max-width: 400px) {
+  .form-container {
+    padding: 16px;
+  }
+  .form-title {
+    font-size: 20px;
+  }
+  .submit-button {
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .form-container {
+    padding: 32px;
+  }
+  .form-title {
+    font-size: 26px;
+  }
+  .submit-button {
+    font-size: 17px;
+    padding: 12px 20px;
+  }
+}
+</style>

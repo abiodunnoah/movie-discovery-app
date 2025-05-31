@@ -2,9 +2,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-// import { useFavoritesStore } from '@/stores/favourites';
-// import { useWatchlistStore } from '@/stores/WatchList';
 import { useUserDataStore } from '@/stores/userData';
+import { NButton, NSpin } from 'naive-ui';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -15,10 +14,9 @@ const router = useRouter();
 const movie = ref(null);
 const credit = ref({ cast: [], crew: [] });
 const isLoading = ref(false);
-// const favoritesStore = useFavoritesStore();
-// const WatchlistStore = useWatchlistStore();
 const userData = useUserDataStore();
 
+// Fetch movie details + credits
 const getMovieDetails = async () => {
   isLoading.value = true;
   try {
@@ -32,9 +30,8 @@ const getMovieDetails = async () => {
     ]);
     movie.value = movieRes.data;
     credit.value = creditRes.data;
-    console.log(creditRes.data);
   } catch (error) {
-    console.log('Error Getting Movies Details', error);
+    console.error('Error getting movie details', error);
   } finally {
     isLoading.value = false;
   }
@@ -42,142 +39,304 @@ const getMovieDetails = async () => {
 
 onMounted(getMovieDetails);
 
-const fullStars = computed(() => Math.floor(movie.value?.vote_average / 2));
-const hasHalfStar = computed(() => (movie.value?.vote_average / 2) % 1 >= 0.5);
+// Compute stars
+const fullStars = computed(() => Math.floor((movie.value?.vote_average || 0) / 2));
+const hasHalfStar = computed(() => ((movie.value?.vote_average || 0) / 2) % 1 >= 0.5);
 const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 : 0));
+
+// Toggle favorites/watchlist
+const toggleFavorite = () => {
+  userData.toggleFavorite(movie.value);
+};
+const toggleWatchlist = () => {
+  userData.toggleWatchlist(movie.value);
+};
 </script>
 
 <template>
-  <div class="pt-4 text-white pb-16 flex justify-center flex-col">
-    <div v-if="isLoading" class="flex justify-center h-96">
+  <div class="details-container">
+    <!-- Loading spinner -->
+    <div v-if="isLoading" class="spinner-wrapper">
       <NSpin size="large" />
     </div>
 
-    <div v-if="movie">
-      <div class="image-container">
-        <img :src="`${IMAGE_BASE_URL}${movie.poster_path}`" alt="Poster" />
-      </div>
-      <h1 class="flex justify-center text-2xl pb-3.5">{{ movie.original_title }}</h1>
-      <div class="flex pb-3">
-        <div class="pr-5">
-          <button
-            class="bg-black p-1.5 rounded-md border-1 cursor-pointer"
-            @click="userData.toggleFavorite(movie)"
-          >
-            <!-- Favorite -->
-            <font-awesome-icon
-              :icon="[userData.isFavorite(movie.id) ? 'fas' : 'far', 'heart']"
-              class="icon"
-            />
-          </button>
+    <div v-else-if="movie" class="content-wrapper">
+      <!-- Poster + Basic Info -->
+      <div class="movie-main-info">
+        <!-- Poster -->
+        <div class="poster-wrapper">
+          <img
+            v-if="movie.poster_path"
+            :src="`${IMAGE_BASE_URL}${movie.poster_path}`"
+            alt="Poster"
+            class="poster-img"
+          />
         </div>
-        <div>
-          <button class="bg-black p-1.5 rounded-md border-1 cursor-pointer">
-            <!-- Watchlist -->
-            <font-awesome-icon
-              @click="userData.toggleWatchlist(movie)"
-              :icon="[userData.isWatchlist(movie.id) ? 'fas' : 'far', 'bookmark']"
-              class="cursor-pointer text-amber-400 text-2xl"
-            />
-          </button>
-        </div>
-      </div>
-      <h2 class="text-xl">Overview :</h2>
-      <p class="pb-3.5">{{ movie.overview }}</p>
-      <p class="pb-3.5">
-        <span class="text-xl">Genres:</span>
-        {{ movie.genres.map((g) => g.name).join(', ') }}
-      </p>
-      <p class="pb-3.5"><span class="text-xl">Release Date:</span> {{ movie.release_date }}</p>
 
-      <div
-        style="background-color: #121212; padding: 20px; border-radius: 10px; margin-bottom: 30px"
-      >
-        <!-- <p class="font-bold text-xl">Rating:</p> -->
-        <div class="text-xl pr">
-          <i
-            v-for="n in fullStars"
-            :key="'full-' + n"
-            class="fas fa-star"
-            style="color: #ffd700"
-          ></i>
-          <i v-if="hasHalfStar" class="fas fa-star-half-alt" style="color: #ffd700"></i>
-          <i
-            v-for="n in emptyStars"
-            :key="'empty-' + n"
-            class="far fa-star"
-            style="color: #555555"
-          ></i>
+        <!-- Info -->
+        <div class="info-wrapper">
+          <h1 class="movie-title">{{ movie.original_title }}</h1>
+
+          <div class="action-buttons">
+            <button @click="toggleFavorite" class="icon-button">
+              <i :class="['fa-heart', userData.isFavorite(movie.id) ? 'fas' : 'far']"></i>
+            </button>
+            <button @click="toggleWatchlist" class="icon-button">
+              <i :class="['fa-bookmark', userData.isWatchlist(movie.id) ? 'fas' : 'far']"></i>
+            </button>
+          </div>
+
+          <p class="overview"><strong>Overview:</strong> {{ movie.overview }}</p>
+          <p class="meta-text">
+            <strong>Genres:</strong>
+            {{ movie.genres.map((g) => g.name).join(', ') }}
+          </p>
+          <p class="meta-text"><strong>Release Date:</strong> {{ movie.release_date }}</p>
+
+          <!-- Star rating -->
+          <div class="rating-wrapper">
+            <i v-for="n in fullStars" :key="'full-' + n" class="fas fa-star star-full"></i>
+            <i v-if="hasHalfStar" class="fas fa-star-half-alt star-full"></i>
+            <i v-for="n in emptyStars" :key="'empty-' + n" class="far fa-star star-empty"></i>
+          </div>
         </div>
+      </div>
+
+      <!-- Cast Section -->
+      <h2 class="section-heading">Cast</h2>
+      <div v-if="credit.cast && credit.cast.length" class="cast-grid">
+        <div v-for="person in credit.cast.slice(0, 10)" :key="person.cast_id" class="cast-card">
+          <img
+            v-if="person.profile_path"
+            :src="`${IMAGE_BASE_URL}${person.profile_path}`"
+            alt="Profile Image"
+            class="cast-img"
+          />
+          <p class="cast-name">{{ person.name }}</p>
+          <p class="cast-role">{{ person.character }}</p>
+        </div>
+      </div>
+
+      <div class="back-btn-wrapper">
+        <NButton secondary @click="router.back()">Back</NButton>
       </div>
     </div>
-
-    <!-- Crew -->
-    <h2 class="flex justify-center text-2xl">Cast</h2>
-    <div v-if="credit.cast && credit.cast.length" class="cast-container">
-      <div v-for="person in credit.cast.slice(0, 10)" :key="person.cast_id" class="cast-details">
-        <img
-          v-if="person.profile_path"
-          :src="`${IMAGE_BASE_URL}${person.profile_path}`"
-          alt="Profile Image"
-          class="rounded-xl"
-        />
-        <p>{{ person.name }}</p>
-        <p>{{ person.character }}</p>
-      </div>
-    </div>
-    <NButton secondary type="info" @click="router.back()" class="button">Back</NButton>
   </div>
 </template>
 
 <style scoped>
-/* .fa-stars {
-  font-size: 20px;
-  margin-right: 8px;
-} */
-
-.image-container {
-  display: flex;
-  justify-content: center;
-  background-color: black;
-  padding: 20px;
-  border-radius: 30px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+/* Container that wraps everything */
+.details-container {
+  /* Use your theme’s background color */
+  background-color: var(--color-background);
+  color: var(--color-text);
+  padding: 1rem;
+  min-height: 100vh;
 }
 
-/* span {
-  font-size: 18px;
-  font-weight: 500;
-} */
-
-.cast-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  justify-content: center;
-  margin-top: 30px;
-  margin-bottom: 50px;
-}
-
-.cast-details {
-  width: 180px;
-  overflow: hidden;
+/* Center spinner while loading */
+.spinner-wrapper {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
-  margin-bottom: 30px;
+  height: 60vh;
 }
 
-.button {
-  padding: 25px;
-  margin-top: 20px;
+/* Main content wrapper: stacks on mobile, side-by-side on desktop */
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.icon {
-  color: red;
-  font-size: 25px;
+/* Poster + Info wrapper */
+.movie-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+/* Poster container */
+.poster-wrapper {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: var(--color-background-soft); /* subtle container bg */
+}
+
+.poster-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Info side: on desktop, sit alongside poster */
+.info-wrapper {
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--color-background-soft);
+  border-radius: 20px;
+  padding: 2rem;
+  /* text-align: center; */
+  transition: transform 0.2s;
+}
+
+/* Movie title */
+.movie-title {
+  font-size: 1.75rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Action buttons (favorite/watchlist) */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
   cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--color-text); /* icon inherits text color */
+}
+
+/* If you want the heart/bookmark icons colored specially, add a small override: */
+.icon-button .fas.fa-heart,
+.icon-button .far.fa-heart {
+  color: #e50914; /* red heart color stays constant */
+}
+.icon-button .fas.fa-bookmark,
+.icon-button .far.fa-bookmark {
+  color: #f0c14b; /* amber bookmark color stays constant */
+}
+
+/* Overview and meta text */
+.overview,
+.meta-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+/* Star rating container */
+.rating-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.star-full {
+  color: #ffd700;
+  font-size: 1.25rem;
+}
+.star-empty {
+  color: var(--color-text); /* use theme’s text color (muted by opacity below) */
+  opacity: 0.5;
+  font-size: 1.25rem;
+}
+
+/* Cast heading */
+.section-heading {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Cast grid: adjusts from 1 to many columns */
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  justify-items: center;
+}
+
+/* Individual cast cards */
+.cast-card {
+  background-color: var(--color-background-soft);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  width: 100%;
+  max-width: 180px;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.cast-card:hover {
+  transform: scale(1.03);
+}
+
+.cast-img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.cast-name {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: var(--color-text);
+}
+.cast-role {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  opacity: 0.8;
+}
+
+/* Back button wrapper */
+.back-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* -------------------------------
+   RESPONSIVE ADJUSTMENTS
+---------------------------------*/
+
+/* On medium screens (≥768px): place poster & info side by side */
+@media (min-width: 768px) {
+  .movie-main-info {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+  .movie-title,
+  .overview,
+  .meta-text {
+    text-align: left;
+  }
+  .action-buttons {
+    justify-content: flex-start;
+  }
+}
+
+/* On large screens (≥1024px): increase spacing & font sizes */
+@media (min-width: 1024px) {
+  .details-container {
+    padding: 2rem;
+  }
+  .movie-title {
+    font-size: 2rem;
+  }
+  .overview,
+  .meta-text {
+    font-size: 1.125rem;
+  }
+  .section-heading {
+    font-size: 1.75rem;
+  }
 }
 </style>

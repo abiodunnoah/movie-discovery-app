@@ -5,57 +5,186 @@ import { useUserDataStore } from '@/stores/userData';
 const router = useRouter();
 const user = useUserDataStore();
 
+// Helper to build full poster URL
 const getPoster = (path) => `https://image.tmdb.org/t/p/w500${path}`;
 
+// Remove from favorites
 const deleteFavorite = (id) => {
   user.removeFavorite(id);
 };
 </script>
 
 <template>
-  <div class="pt-5 pb-12 text-white px-4 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-semibold text-center mb-6">My Favorites</h1>
+  <!-- Root container uses CSS variables for background and text -->
+  <div class="favorites-root">
+    <h1 class="favorites-title">My Favorites</h1>
 
     <!-- Empty state -->
-    <div v-if="!user.favorites.length" class="flex items-center justify-center h-64 text-gray-400">
+    <div v-if="!user.favorites.length" class="empty-state">
       <p>No favorites yet.</p>
     </div>
 
-    <!-- Responsive grid -->
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div v-for="movie in user.favorites" :key="movie.id" class="flex flex-col items-center">
-        <router-link :to="`/movie/${movie.id}`" class="w-full">
-          <img
-            :src="getPoster(movie.poster_path)"
-            alt="Movie Poster"
-            class="rounded-2xl shadow-lg transition-transform hover:scale-105"
-          />
+    <!-- Favorites grid -->
+    <div v-else class="favorites-grid">
+      <div v-for="movie in user.favorites" :key="movie.id" class="favorite-item">
+        <router-link :to="`/movie/${movie.id}`" class="poster-link">
+          <img :src="getPoster(movie.poster_path)" alt="Movie Poster" class="poster-img" />
         </router-link>
-        <h2 class="mt-3 text-center text-base font-medium line-clamp-2">
-          {{ movie.original_title }}
-        </h2>
-        <button
-          @click="deleteFavorite(movie.id)"
-          class="mt-4 px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 rounded-full transition-colors"
-        >
-          Remove
-        </button>
+
+        <h2 class="movie-name">{{ movie.original_title }}</h2>
+
+        <button class="remove-btn" @click="deleteFavorite(movie.id)">Remove</button>
       </div>
     </div>
 
     <!-- Back button -->
-    <div class="flex justify-center mt-12">
-      <NButton secondary type="info" @click="router.back()"> Back </NButton>
+    <div class="back-button-container">
+      <button class="back-btn" @click="router.back()">Back</button>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Optional: clamp titles to two lines with ellipsis */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+/* Root wrapper */
+.favorites-root {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  padding: 16px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Page title */
+.favorites-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+/* Empty state styling */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.empty-state p {
+  color: var(--color-text-muted);
+  font-size: 16px;
+}
+
+/* Grid container */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+}
+
+/* At ≥ 600px: 2 columns */
+@media (min-width: 600px) {
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* At ≥ 900px: 3 columns */
+@media (min-width: 900px) {
+  .favorites-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* At ≥ 1200px: 4 columns */
+@media (min-width: 1200px) {
+  .favorites-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Individual favorite item */
+.favorite-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-background-soft);
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.favorite-item:hover {
+  transform: scale(1.02);
+}
+
+/* Poster link wrapper to make full-width image clickable */
+.poster-link {
+  width: 100%;
+  display: block;
+}
+
+/* Poster image */
+.poster-img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Movie title below the poster */
+.movie-name {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 12px 8px 8px 8px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* limit to 2 lines */
+  -webkit-box-orient: vertical;
+  line-height: 1.2em;
+  max-height: 2.4em; /* 2 lines × 1.2em */
+}
+
+/* Remove button styling */
+.remove-btn {
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.remove-btn:hover {
+  background-color: darken(var(--color-accent), 10%);
+}
+
+/* Back button container */
+.back-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+/* Back button styling */
+.back-btn {
+  padding: 10px 20px;
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 </style>
