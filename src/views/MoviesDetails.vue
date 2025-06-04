@@ -53,7 +53,7 @@ const toggleFavorite = () => {
     return;
   }
   errorMsg.value = '';
-  userData.toggleWatchlist(movie.value);
+  userData.toggleFavorite(movie.value);
 };
 
 const toggleWatchlist = () => {
