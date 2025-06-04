@@ -5,6 +5,8 @@ import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 import { NButton } from 'naive-ui';
 import { useThemeStore } from '@/stores/Theme';
+import { NSwitch, NIcon } from 'naive-ui';
+import { SunnyOutline, MoonOutline } from '@vicons/ionicons5';
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -88,14 +90,11 @@ watch(
           <RouterLink to="/favorites">Favorite</RouterLink>
           <RouterLink to="/watchlist">Watchlist</RouterLink>
 
-          <label class="switch">
-            <input
-              type="checkbox"
-              :checked="themeStore.theme === 'dark'"
-              @change="themeStore.toggleTheme"
-            />
-            <span class="slider round"></span>
-          </label>
+          <NButton quaternary @click="themeStore.toggleTheme">
+            <NIcon size="25">
+              <component :is="themeStore.theme === 'dark' ? MoonOutline : SunnyOutline" />
+            </NIcon>
+          </NButton>
 
           <div>
             <template v-if="auth.user">
@@ -128,22 +127,22 @@ watch(
       </header>
 
       <!-- MOBILE DROPDOWN -->
-      <div v-if="!isDesktop && mobileMenuOpen" class="mt-4 mb-4 flex flex-col gap-4">
+      <div
+        v-if="!isDesktop && mobileMenuOpen"
+        class="mt-2 mb-4 flex items-center justify-center gap-5"
+      >
         <RouterLink to="/favorites">Favorite</RouterLink>
         <RouterLink to="/watchlist">Watchlist</RouterLink>
 
-        <label class="switch">
-          <input
-            type="checkbox"
-            :checked="themeStore.theme === 'dark'"
-            @change="themeStore.toggleTheme"
-          />
-          <span class="slider round"></span>
-        </label>
+        <NButton quaternary @click="themeStore.toggleTheme">
+          <NIcon size="25">
+            <component :is="themeStore.theme === 'dark' ? MoonOutline : SunnyOutline" />
+          </NIcon>
+        </NButton>
 
         <div>
           <template v-if="auth.user">
-            <div class="flex items-center gap-2">
+            <div class="flex flex-col items-center gap-2">
               <img
                 src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-762.jpg?w=826"
                 class="w-8 h-8 rounded-full"
@@ -193,58 +192,3 @@ watch(
     </div>
   </nav>
 </template>
-
-<style scoped>
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px;
-}
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.4s;
-}
-.slider:before {
-  position: absolute;
-  content: '';
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: 0.4s;
-}
-input:checked + .slider {
-  background-color: #2196f3;
-}
-input:checked + .slider:before {
-  transform: translateX(26px);
-}
-.slider.round {
-  border-radius: 24px;
-}
-.slider.round:before {
-  border-radius: 50%;
-}
-
-/* Hide scrollbar in genre bar */
-.no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-</style>

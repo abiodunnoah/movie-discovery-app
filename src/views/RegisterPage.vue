@@ -8,10 +8,37 @@ const auth = useAuthStore();
 
 const email = ref('');
 const password = ref('');
+const confirmPassword = ref('');
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 const error = ref(null);
 
 async function submit() {
   error.value = null;
+
+  if (password.value !== confirmPassword.value) {
+    error.value = 'Passwords do not match';
+    return;
+  }
+
+  if (!email.value || !password.value) {
+    error.value = 'Email and password are required';
+    return;
+  }
+
+  if (password.value.length < 6) {
+    error.value = 'Password must be at least 6 characters long';
+    return;
+  }
+  if (password.value.toLowerCase() === 'password') {
+    error.value = 'Password cannot be "password"';
+    return;
+  }
+  if (password.value.toLowerCase() === '123456') {
+    error.value = 'Password cannot be "123456"';
+    return;
+  }
+
   try {
     await auth.register(email.value, password.value);
     router.push('/');
@@ -30,13 +57,49 @@ async function submit() {
           <label for="email" class="form-label">Email:</label>
           <input id="email" v-model="email" type="email" required class="form-input" />
         </div>
+
         <div class="form-group">
           <label for="password" class="form-label">Password:</label>
-          <input id="password" v-model="password" type="password" required class="form-input" />
+          <div class="input-wrapper">
+            <input
+              id="password"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              required
+              class="form-input"
+            />
+
+            <button type="button" @click="showPassword = !showPassword" class="toggle-password">
+              {{ showPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
         </div>
+
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">Confirm Password:</label>
+          <div class="input-wrapper">
+            <input
+              id="confirmPassword"
+              v-model="confirmPassword"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              required
+              class="form-input"
+            />
+
+            <button
+              type="button"
+              @click="showConfirmPassword = !showConfirmPassword"
+              class="toggle-password"
+            >
+              {{ showConfirmPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+        </div>
+
         <div v-if="error" class="form-error">{{ error }}</div>
+
         <!-- Sign Up button with fallback -->
-        <button type="submit" class="submit-button">Sign Up</button>
+        <button type="submit" class="submit-button bg-blue-600 hover:bg-blue-700">Sign Up</button>
       </form>
       <p class="switch-login">
         Already have an account?
@@ -113,7 +176,45 @@ async function submit() {
 
 .form-input:focus {
   outline: none;
-  border-color: var(--color-accent, #38a169);
+  border-color: var(--color-accent, #3182ce);
+  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+  color: var(--color-text, #181818);
+  background-color: var(--color-background-soft, #f5f5f5);
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+/* .input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password {
+  background-color: transparent;
+  background: none;
+  border: none;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+} */
+
+.input-wrapper {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text, #181818);
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .form-error {
@@ -124,7 +225,7 @@ async function submit() {
 
 /* Sign Up button with fallback color if --color-accent is missing */
 .submit-button {
-  background-color: var(--color-accent, #38a169);
+  /* background-color: var(--color-accent, #38a169); */
   color: #ffffff;
   padding: 10px 16px;
   font-size: 16px;
@@ -135,9 +236,9 @@ async function submit() {
   transition: background-color 0.2s;
 }
 
-.submit-button:hover {
+/* .submit-button:hover {
   background-color: var(--color-accent-hover, #2f855a);
-}
+} */
 
 /* “Already have an account?” text */
 .switch-login {
