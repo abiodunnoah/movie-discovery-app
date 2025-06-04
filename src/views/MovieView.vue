@@ -10,7 +10,7 @@ const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 const movies = ref(null);
-const selectedGenre = ref(null);
+const selectedGenre = ref('');
 const search = ref('');
 const page = ref(1);
 const totalPages = ref(1);

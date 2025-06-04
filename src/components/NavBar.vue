@@ -129,7 +129,7 @@ watch(
       <!-- MOBILE DROPDOWN -->
       <div
         v-if="!isDesktop && mobileMenuOpen"
-        class="mt-2 mb-4 flex items-center justify-center gap-5"
+        class="mt-2 mb-4 flex items-center justify-center gap-5 flex-wrap"
       >
         <RouterLink to="/favorites">Favorite</RouterLink>
         <RouterLink to="/watchlist">Watchlist</RouterLink>
@@ -142,7 +142,7 @@ watch(
 
         <div>
           <template v-if="auth.user">
-            <div class="flex flex-col items-center gap-2">
+            <div class="flex items-center gap-3">
               <img
                 src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-762.jpg?w=826"
                 class="w-8 h-8 rounded-full"
@@ -192,3 +192,10 @@ watch(
     </div>
   </nav>
 </template>
+
+<style scoped>
+.active {
+  background-color: var(--color-background-mute);
+  color: var(--color-text);
+}
+</style>

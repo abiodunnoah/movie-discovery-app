@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { useUserDataStore } from '@/stores/userData';
+import { auth } from '@/Firebase';
 import { NButton, NSpin } from 'naive-ui';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -15,6 +16,7 @@ const movie = ref(null);
 const credit = ref({ cast: [], crew: [] });
 const isLoading = ref(false);
 const userData = useUserDataStore();
+const errorMsg = ref('');
 
 // Fetch movie details + credits
 const getMovieDetails = async () => {
@@ -46,9 +48,20 @@ const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 :
 
 // Toggle favorites/watchlist
 const toggleFavorite = () => {
-  userData.toggleFavorite(movie.value);
+  if (!auth.currentUser) {
+    errorMsg.value = 'You must be logged in to add to favorites.';
+    return;
+  }
+  errorMsg.value = '';
+  userData.toggleWatchlist(movie.value);
 };
+
 const toggleWatchlist = () => {
+  if (!auth.currentUser) {
+    errorMsg.value = 'You must be logged in to add to watchlist.';
+    return;
+  }
+  errorMsg.value = '';
   userData.toggleWatchlist(movie.value);
 };
 </script>
@@ -85,6 +98,8 @@ const toggleWatchlist = () => {
               <i :class="['fa-bookmark', userData.isWatchlist(movie.id) ? 'fas' : 'far']"></i>
             </button>
           </div>
+
+          <p v-if="errorMsg" class="error-text">{{ errorMsg }}</p>
 
           <p class="overview"><strong>Overview:</strong> {{ movie.overview }}</p>
           <p class="meta-text">
@@ -215,6 +230,15 @@ const toggleWatchlist = () => {
 .icon-button .fas.fa-bookmark,
 .icon-button .far.fa-bookmark {
   color: #f0c14b; /* amber bookmark color stays constant */
+}
+/* Error message */
+.error-text {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  transition: opacity 0.3s ease;
 }
 
 /* Overview and meta text */
