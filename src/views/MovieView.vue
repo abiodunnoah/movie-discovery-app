@@ -3,15 +3,14 @@ import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import NavBar from '@/components/NavBar.vue';
 import MovieCard from '@/components/MovieCard.vue';
-import { auth } from '@/Firebase';
 
-// const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN
+// TMDB configuration
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-const movies = ref(null);
+const movies = ref([]);
 const selectedGenre = ref('');
-const search = ref('');
+const search = ref(''); // ← this will be updated by NavBar (after debounce)
 const page = ref(1);
 const totalPages = ref(1);
 const isLoading = ref(false);
@@ -19,9 +18,10 @@ const isLoading = ref(false);
 const getMovies = async () => {
   isLoading.value = true;
   try {
-    const endPoint = search.value ? `${BASE_URL}/search/movie` : `${BASE_URL}/discover/movie`;
+    // Decide endpoint based on whether `search` is empty
+    const endpoint = search.value ? `${BASE_URL}/search/movie` : `${BASE_URL}/discover/movie`;
 
-    const response = await axios.get(endPoint, {
+    const response = await axios.get(endpoint, {
       params: {
         api_key: API_KEY,
         with_genres: selectedGenre.value || '',
@@ -31,39 +31,40 @@ const getMovies = async () => {
     });
     movies.value = response.data.results;
     totalPages.value = response.data.total_pages;
-    console.log(response.data);
   } catch (error) {
-    console.log('Error fetching Movies', error);
+    console.error('Error fetching Movies', error);
   } finally {
     isLoading.value = false;
   }
 };
 
-watch([selectedGenre, search], ([, newSearch]) => {
-  if (newSearch.trim() !== '') {
+// Whenever `selectedGenre` or the (already debounced) `search` changes, refetch:
+watch([selectedGenre, search], ([newSearch]) => {
+  // If user typed a new search string, clear any genre filter:
+  if (newSearch && newSearch.length > 0) {
     selectedGenre.value = '';
   }
   page.value = 1;
   getMovies();
 });
 
+// Pagination watcher
 watch(page, getMovies);
+
+// Initial load
+onMounted(getMovies);
 
 const nextPage = () => {
   if (page.value < totalPages.value) page.value++;
 };
-
 const prevPage = () => {
   if (page.value > 1) page.value--;
 };
-
-onMounted(() => {
-  getMovies();
-});
 </script>
 
 <template>
   <main>
+    <!-- Bind `search` directly to NavBar. NavBar will emit update:search only after 500 ms. -->
     <NavBar
       v-model:search="search"
       @genreSelected="(id) => (selectedGenre = id)"
@@ -74,13 +75,11 @@ onMounted(() => {
       <NSpin size="large" />
     </div>
 
-    <div>
-      <MovieCard :movies="movies" />
-    </div>
+    <MovieCard :movies="movies" />
 
     <div class="flex justify-center pt-8 pb-12">
       <button class="button" @click="prevPage" :disabled="page === 1">&lt;</button>
-      <button class="button" @click="nextPage" :disabled="page >= totalPages">></button>
+      <button class="button" @click="nextPage" :disabled="page >= totalPages">&gt;</button>
     </div>
   </main>
 </template>
@@ -92,7 +91,7 @@ onMounted(() => {
   height: 50px;
   border-radius: 100%;
   margin: 0 5px;
-  cursor: point;
+  cursor: pointer;
   background: rgba(221, 220, 220, 0.5);
   color: black;
 }

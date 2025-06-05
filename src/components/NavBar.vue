@@ -17,17 +17,34 @@ const emit = defineEmits(['genreSelected', 'update:search']);
 const { search, selectedGenre } = defineProps(['search', 'selectedGenre']);
 
 // Local state
+// 1) Bind the <input> to this ref, initialized from the prop `search`
 const searchInput = ref(search);
+
+// TMDB genre list
 const genres = ref([]);
 const mobileMenuOpen = ref(false);
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const BASE_URL = 'https://api.themoviedb.org/3';
 
-// Breakpoint detector
+let debounceTimer = null;
+
+// Fetch genres once on mount
+const getGenres = async () => {
+  try {
+    const { data } = await axios.get(`${BASE_URL}/genre/movie/list`, {
+      params: { api_key: API_KEY },
+    });
+    genres.value = data.genres;
+  } catch (e) {
+    console.error('Error fetching genres', e);
+  }
+};
+
+// Breakpoint detector for desktop vs mobile
 const isDesktop = ref(window.innerWidth >= 768);
 function handleResize() {
   isDesktop.value = window.innerWidth >= 768;
 }
-onMounted(() => window.addEventListener('resize', handleResize));
-onUnmounted(() => window.removeEventListener('resize', handleResize));
 
 // Auth & logout
 auth.fetchUser();
@@ -40,29 +57,37 @@ const handleLogout = async () => {
   }
 };
 
-// TMDB genres fetch
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const BASE_URL = 'https://api.themoviedb.org/3';
-const getGenres = async () => {
-  try {
-    const { data } = await axios.get(`${BASE_URL}/genre/movie/list`, {
-      params: { api_key: API_KEY },
-    });
-    genres.value = data.genres;
-  } catch (e) {
-    console.error('Error fetching genres', e);
-  }
-};
-onMounted(getGenres);
+// ─── Lifecycle hooks ───
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  getGenres();
+});
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+  // Clear any pending debounce timer
+  if (debounceTimer) clearTimeout(debounceTimer);
+});
 
-// Emit search updates
-watch(searchInput, (val) => emit('update:search', val));
+// ─── Debounced watcher ───
+// Whenever `searchInput` changes (on every keystroke), reset a 500ms timeout.
+// Only when 500ms have passed without new keystrokes do we emit `update:search`.
+watch(searchInput, (newVal) => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    emit('update:search', newVal.trim());
+  }, 2000);
+});
 
-// Clear search on genre change
+// Whenever selectedGenre changes (e.g. user clicks a genre), clear searchInput:
 watch(
   () => selectedGenre,
   (g) => {
-    if (g) searchInput.value = '';
+    if (g) {
+      searchInput.value = '';
+      // We also immediately emit an empty string, so parent resets its search:
+      if (debounceTimer) clearTimeout(debounceTimer);
+      emit('update:search', '');
+    }
   },
 );
 </script>
@@ -77,7 +102,7 @@ watch(
         <!-- Logo -->
         <h1 class="text-xl font-bold">Movie App</h1>
 
-        <!-- Search -->
+        <!-- Search input (debounced) -->
         <input
           v-model="searchInput"
           type="search"
@@ -90,6 +115,7 @@ watch(
           <RouterLink to="/favorites">Favorite</RouterLink>
           <RouterLink to="/watchlist">Watchlist</RouterLink>
 
+          <!-- Theme toggle (sun/moon icon) -->
           <NButton quaternary @click="themeStore.toggleTheme">
             <NIcon size="25">
               <component :is="themeStore.theme === 'dark' ? MoonOutline : SunnyOutline" />
