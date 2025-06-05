@@ -1,9 +1,12 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { useUserDataStore } from '@/stores/userData';
 
 const router = useRouter();
 const user = useUserDataStore();
+const isCheckingAuth = ref(true);
 
 // Helper to build full poster URL
 const getPoster = (path) => `https://image.tmdb.org/t/p/w500${path}`;
@@ -12,11 +15,32 @@ const getPoster = (path) => `https://image.tmdb.org/t/p/w500${path}`;
 const deleteFavorite = (id) => {
   user.removeFavorite(id);
 };
+
+onMounted(() => {
+  const auth = getAuth();
+  // Wait for auth state to be determined
+  const unSubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    if (firebaseUser) {
+      // User is authenticated, load their data
+      isCheckingAuth.value = false;
+    } else {
+      // User is not authenticated, redirect to login
+      isCheckingAuth.value = false;
+      router.replace({ name: 'Login' });
+    }
+    unSubscribe(); // Clean up listener
+  });
+});
 </script>
 
 <template>
-  <!-- Root container uses CSS variables for background and text -->
-  <div class="favorites-root">
+  <!-- Show loading state while checking auth -->
+  <div v-if="isCheckingAuth" class="flex justify-center items-center min-h-screen">
+    <p>Loading...</p>
+  </div>
+
+  <!-- Main content -->
+  <div v-else class="favorites-root">
     <h1 class="favorites-title">My Favorites</h1>
 
     <!-- Empty state -->

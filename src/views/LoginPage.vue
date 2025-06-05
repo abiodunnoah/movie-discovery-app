@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { NSpin } from 'naive-ui';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -11,13 +12,18 @@ const password = ref('');
 const showPassword = ref(false);
 const error = ref(null);
 
+const isSumbitting = ref(false);
+
 async function submit() {
   error.value = null;
+  isSumbitting.value = true;
+
   try {
     await auth.login(email.value, password.value);
     router.push('/');
   } catch (e) {
     error.value = e.message;
+    isSumbitting.value = false;
   }
 }
 </script>
@@ -63,12 +69,17 @@ async function submit() {
         </div>
 
         <div v-if="error" class="pb-4 text-red-500 text-sm">{{ error }}</div>
+
         <div>
           <button
             type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
+            class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors flex items-center justify-center"
+            :disabled="isSumbitting"
           >
-            Sign In
+            <template v-if="isSumbitting">
+              <NSpin size="small" class="mr-2" /> Signing In...
+            </template>
+            <template v-else> Sign In </template>
           </button>
         </div>
       </form>

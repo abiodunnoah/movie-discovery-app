@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { NSpin } from 'naive-ui';
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -12,6 +13,7 @@ const confirmPassword = ref('');
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const error = ref(null);
+const isSubmitting = ref(false);
 
 async function submit() {
   error.value = null;
@@ -39,11 +41,15 @@ async function submit() {
     return;
   }
 
+  isSubmitting.value = true;
+
   try {
     await auth.register(email.value, password.value);
     router.push('/');
   } catch (e) {
     error.value = e.message;
+  } finally {
+    isSubmitting.value = false;
   }
 }
 </script>
@@ -99,8 +105,18 @@ async function submit() {
         <div v-if="error" class="form-error">{{ error }}</div>
 
         <!-- Sign Up button with fallback -->
-        <button type="submit" class="submit-button bg-blue-600 hover:bg-blue-700">Sign Up</button>
+        <button
+          type="submit"
+          class="submit-button bg-blue-600 hover:bg-blue-700 flex justify-center items-center"
+          :disabled="isSubmitting"
+        >
+          <template v-if="isSubmitting">
+            <NSpin size="small" class="mr-2" /> Signing Up...
+          </template>
+          <template v-else> Sign Up </template>
+        </button>
       </form>
+
       <p class="switch-login">
         Already have an account?
         <!-- “Login here” link with fallback -->

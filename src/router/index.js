@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import MovieView from '@/views/MovieView.vue';
 import { useAuthStore } from '@/stores/auth';
 
@@ -43,13 +44,51 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from, next) => {
+// A helper that returns a promise which resolves once Firebase knows the user state
+function getCurrentUser() {
+  return new Promise((resolve, reject) => {
+    const auth = getAuth();
+    const removeListener = onAuthStateChanged(
+      auth,
+      (user) => {
+        removeListener();
+        resolve(user);
+      },
+      (error) => {
+        removeListener();
+        reject(error);
+      },
+    );
+  });
+}
+
+// Navigation guard to check authentication status
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
+  let firebaseUser = null;
+  try {
+    firebaseUser = await getCurrentUser();
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    firebaseUser = null;
+  }
+
+  if (firebaseUser && !authStore.user) {
+    authStore.fetchUser?.();
+  }
+
+  // Now enforce the route's meta.requiresAuth
   if (to.meta.requiresAuth && !authStore.user) {
     next('/login');
   } else {
     next();
+  }
+  const user = await getCurrentUser();
+  if (user) {
+    next();
+  } else {
+    next({ name: 'Login' });
   }
 });
 
