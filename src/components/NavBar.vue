@@ -5,8 +5,6 @@ import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 import { NButton } from 'naive-ui';
 import { useThemeStore } from '@/stores/Theme';
-import { NSwitch, NIcon } from 'naive-ui';
-import { SunnyOutline, MoonOutline } from '@vicons/ionicons5';
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -42,12 +40,14 @@ const getGenres = async () => {
 
 // Breakpoint detector for desktop vs mobile
 const isDesktop = ref(window.innerWidth >= 768);
+
 function handleResize() {
   isDesktop.value = window.innerWidth >= 768;
 }
 
 // Auth & logout
 auth.fetchUser();
+
 const handleLogout = async () => {
   try {
     await auth.logout();

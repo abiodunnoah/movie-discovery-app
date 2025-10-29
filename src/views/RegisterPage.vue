@@ -58,6 +58,7 @@ async function submit() {
   <div class="register-root">
     <div class="form-container">
       <h2 class="form-title">Register</h2>
+
       <form @submit.prevent="submit" class="form-content">
         <div class="form-group">
           <label for="email" class="form-label">Email:</label>
@@ -82,7 +83,7 @@ async function submit() {
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword" class="form-label">Confirm Password:</label>
+          <label for="confirm password" class="form-label">Confirm Password:</label>
           <div class="input-wrapper">
             <input
               id="confirmPassword"
@@ -119,7 +120,6 @@ async function submit() {
 
       <p class="switch-login">
         Already have an account?
-        <!-- “Login here” link with fallback -->
         <router-link to="/login" class="login-link">Login here</router-link>
       </p>
     </div>
@@ -139,7 +139,6 @@ async function submit() {
   box-sizing: border-box;
 }
 
-/* Form container */
 .form-container {
   background-color: var(--color-background-soft, #f5f5f5);
   border: 1px solid var(--color-border, #cccccc);
@@ -201,22 +200,6 @@ async function submit() {
     background-color 0.2s;
 }
 
-/* .input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.toggle-password {
-  background-color: transparent;
-  background: none;
-  border: none;
-  position: absolute;
-  right: 10px;
-  cursor: pointer;
-  font-size: 18px;
-} */
-
 .input-wrapper {
   position: relative;
 }
@@ -239,9 +222,7 @@ async function submit() {
   color: #e53e3e;
 }
 
-/* Sign Up button with fallback color if --color-accent is missing */
 .submit-button {
-  /* background-color: var(--color-accent, #38a169); */
   color: #ffffff;
   padding: 10px 16px;
   font-size: 16px;
@@ -252,11 +233,6 @@ async function submit() {
   transition: background-color 0.2s;
 }
 
-/* .submit-button:hover {
-  background-color: var(--color-accent-hover, #2f855a);
-} */
-
-/* “Already have an account?” text */
 .switch-login {
   margin-top: 16px;
   font-size: 14px;
@@ -264,7 +240,6 @@ async function submit() {
   color: var(--color-text, #181818);
 }
 
-/* Login link with fallback if --color-link is missing */
 .login-link {
   color: var(--color-link, #3182ce);
   text-decoration: none;
