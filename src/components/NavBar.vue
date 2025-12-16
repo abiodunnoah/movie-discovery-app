@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { RouterLink } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
-import { NButton } from 'naive-ui';
+import { NButton, NIcon } from 'naive-ui';
+import { MoonOutline, SunnyOutline } from '@vicons/ionicons5';
 import { useThemeStore } from '@/stores/Theme';
 
-const router = useRouter();
 const auth = useAuthStore();
 const themeStore = useThemeStore();
 
@@ -84,7 +84,6 @@ watch(
   (g) => {
     if (g) {
       searchInput.value = '';
-      // We also immediately emit an empty string, so parent resets its search:
       if (debounceTimer) clearTimeout(debounceTimer);
       emit('update:search', '');
     }
@@ -97,9 +96,7 @@ watch(
     class="bg-[var(--color-background)] text-[var(--color-text)] border-b border-[var(--color-border)]"
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- HEADER -->
       <header class="flex items-center justify-between py-4">
-        <!-- Logo -->
         <h1 class="text-xl font-bold">Movie App</h1>
 
         <!-- Search input (debounced) -->
