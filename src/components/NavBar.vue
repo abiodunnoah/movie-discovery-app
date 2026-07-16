@@ -15,8 +15,8 @@ const emit = defineEmits(['genreSelected', 'update:search']);
 const { search, selectedGenre } = defineProps(['search', 'selectedGenre']);
 
 // Local state
-// 1) Bind the <input> to this ref, initialized from the prop `search`
 const searchInput = ref(search);
+const isSearching = ref(false);
 
 // TMDB genre list
 const genres = ref([]);
@@ -73,9 +73,11 @@ onUnmounted(() => {
 // Only when 500ms have passed without new keystrokes do we emit `update:search`.
 watch(searchInput, (newVal) => {
   if (debounceTimer) clearTimeout(debounceTimer);
+  isSearching.value = true;
   debounceTimer = setTimeout(() => {
+    isSearching.value = false;
     emit('update:search', newVal.trim());
-  }, 2000);
+  }, 500);
 });
 
 // Whenever selectedGenre changes (e.g. user clicks a genre), clear searchInput:
@@ -85,6 +87,7 @@ watch(
     if (g) {
       searchInput.value = '';
       if (debounceTimer) clearTimeout(debounceTimer);
+      isSearching.value = false;
       emit('update:search', '');
     }
   },
@@ -100,12 +103,19 @@ watch(
         <h1 class="text-xl font-bold">Movie App</h1>
 
         <!-- Search input (debounced) -->
-        <input
-          v-model="searchInput"
-          type="search"
-          placeholder="Search..."
-          class="w-40 sm:w-48 md:w-56 lg:w-64 px-4 py-2 rounded-full border-0 bg-[var(--color-background-soft)] text-[var(--color-text)] placeholder-[var(--color-text)] caret-[var(--color-text)] focus:outline-none"
-        />
+        <div class="relative">
+          <input
+            v-model="searchInput"
+            type="search"
+            placeholder="Search..."
+            class="w-40 sm:w-48 md:w-56 lg:w-64 px-4 py-2 pr-8 rounded-full border-0 bg-[var(--color-background-soft)] text-[var(--color-text)] placeholder-[var(--color-text)] caret-[var(--color-text)] focus:outline-none"
+          />
+          <span
+            v-if="isSearching"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-sm opacity-60"
+            >...</span
+          >
+        </div>
 
         <!-- DESKTOP NAV -->
         <div v-if="isDesktop" class="flex items-center gap-5">

@@ -84,12 +84,6 @@ router.beforeEach(async (to, from, next) => {
   } else {
     next();
   }
-  const user = await getCurrentUser();
-  if (user) {
-    next();
-  } else {
-    next({ name: 'Login' });
-  }
 });
 
 export default router;

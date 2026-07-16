@@ -10,10 +10,11 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 
 const movies = ref([]);
 const selectedGenre = ref('');
-const search = ref(''); // ← this will be updated by NavBar (after debounce)
+const search = ref('');
 const page = ref(1);
 const totalPages = ref(1);
 const isLoading = ref(false);
+const errorMsg = ref('');
 
 const getMovies = async () => {
   isLoading.value = true;
@@ -31,8 +32,10 @@ const getMovies = async () => {
     });
     movies.value = response.data.results;
     totalPages.value = response.data.total_pages;
+    errorMsg.value = '';
   } catch (error) {
     console.error('Error fetching Movies', error);
+    errorMsg.value = 'Failed to load movies. Please try again later.';
   } finally {
     isLoading.value = false;
   }
@@ -75,12 +78,39 @@ const prevPage = () => {
       <NSpin size="large" />
     </div>
 
-    <MovieCard :movies="movies" />
-
-    <div class="flex justify-center pt-8 pb-12">
-      <button class="button" @click="prevPage" :disabled="page === 1">&lt;</button>
-      <button class="button" @click="nextPage" :disabled="page >= totalPages">&gt;</button>
+    <div v-else-if="errorMsg" class="flex flex-col items-center justify-center h-96 gap-4">
+      <p class="text-red-500 text-lg">{{ errorMsg }}</p>
+      <button
+        @click="getMovies"
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+      >
+        Retry
+      </button>
     </div>
+
+    <template v-else>
+      <MovieCard :movies="movies" />
+
+      <div class="flex justify-center items-center gap-4 pt-8 pb-12">
+        <button
+          class="button"
+          @click="prevPage"
+          :disabled="page === 1"
+          :class="{ 'opacity-40 cursor-not-allowed': page === 1 }"
+        >
+          &lt;
+        </button>
+        <span class="text-sm">Page {{ page }} of {{ totalPages || 1 }}</span>
+        <button
+          class="button"
+          @click="nextPage"
+          :disabled="page >= totalPages"
+          :class="{ 'opacity-40 cursor-not-allowed': page >= totalPages }"
+        >
+          &gt;
+        </button>
+      </div>
+    </template>
   </main>
 </template>
 
