@@ -55,5 +55,8 @@
   "bugs": {
     "url": "https://github.com/abiodunnoah/movie-discovery-app/issues"
   },
-  "homepage": "https://github.com/abiodunnoah/movie-discovery-app#readme"
+  "homepage": "https://github.com/abiodunnoah/movie-discovery-app#readme",
+  "allowScripts": {
+    "puppeteer@24.34.0": true
+  }
 }
